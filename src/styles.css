@@ -1,0 +1,3 @@
+﻿@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+:root{font-family:system-ui,"Segoe UI",Roboto,sans-serif;font-synthesis:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}body{margin:0;min-width:320px;min-height:100vh}.card{transition:transform 160ms ease,box-shadow 160ms ease}@media(prefers-reduced-motion:no-preference){.card:hover{transform:translateY(-2px)}}

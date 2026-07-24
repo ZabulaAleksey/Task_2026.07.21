@@ -1,0 +1,39 @@
+﻿<section class="card border-0 shadow-sm mt-5 overflow-hidden" aria-labelledby="live-rates-title">
+  <div class="card-header bg-body border-0 px-4 pt-4 pb-0">
+    <div class="d-flex flex-column flex-md-row align-items-md-start justify-content-between gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2">
+          <h2 id="live-rates-title" class="h5 mb-0"><i class="bi bi-activity text-primary me-2"></i>{{ text('title') }}</h2>
+          <span class="badge rounded-pill" [class.text-bg-success]="state === 'live'" [class.text-bg-warning]="state === 'connecting' || state === 'reconnecting'" [class.text-bg-danger]="state === 'error'">
+            @if (state === 'live') { <span class="live-dot me-1" aria-hidden="true"></span> }{{ stateText() }}
+          </span>
+        </div>
+        <p class="small text-body-secondary mt-2 mb-0">{{ text('subtitle') }}</p>
+      </div>
+      <div class="pair-control">
+        <label for="currency-pair" class="form-label small fw-semibold mb-1">{{ text('pair') }}</label>
+        <select id="currency-pair" class="form-select form-select-sm" [(ngModel)]="selectedPair" (ngModelChange)="changePair()">
+          @for (pair of pairs; track pair) { <option [value]="pair">{{ pair }}</option> }
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="card-body px-4 pb-4">
+    <div class="price-row mt-3 mb-3">
+      <div>
+        <span class="small text-body-secondary d-block">{{ text('latest') }}</span>
+        <strong class="latest-price">{{ latestPrice === null ? '—' : latestPrice.toLocaleString(language === 'uk' ? 'uk-UA' : language === 'ru' ? 'ru-RU' : 'en-US', { maximumFractionDigits: 6 }) }}</strong>
+        <span class="text-body-secondary ms-2">{{ selectedPair }}</span>
+      </div>
+      @if (lastUpdate) { <time class="small text-body-secondary">{{ lastUpdate.toLocaleTimeString() }}</time> }
+    </div>
+    <div class="chart-wrap">
+      <canvas #ratesCanvas role="img" [attr.aria-label]="text('title') + ': ' + selectedPair"></canvas>
+      @if (latestPrice === null) {
+        <div class="chart-placeholder text-body-secondary text-center">
+          @if (message) { <i class="bi bi-exclamation-circle me-2"></i>{{ message }} } @else { <span class="spinner-grow spinner-grow-sm text-primary me-2"></span>{{ text('empty') }} }
+        </div>
+      }
+    </div>
+  </div>
+</section>
