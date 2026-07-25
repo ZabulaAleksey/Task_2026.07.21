@@ -1,1 +1,0 @@
-{"root":["./src/main.ts","./src/vite-env.d.ts","./src/lib/finance.ts","./src/lib/i18n.ts","./src/lib/types.ts","./src/app.vue","./src/components/apikeyform.vue","./src/components/financedashboard.vue","./src/components/financelogo.vue","./src/components/financenavbar.vue"],"version":"6.0.3"}
