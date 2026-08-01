@@ -33,7 +33,7 @@
    ```bash
    npm install
    ```
-2. Создайте файл `.env` в корне проекта и добавьте переменную с ключом валютного API:
+2. Создайте файл `.env` в корне проекта и добавьте переменную с ключом валютного API, полученного на сайте currencyfreaks.com:
    ```bash
    VITE_CURRENCY_API_KEY=your_currency_api_key
    ```
