@@ -1,78 +1,248 @@
-import { writable } from "svelte/store";
-import type { Language } from "./types";
+import type { Language } from "$lib/types";
 
-export const translations = {
-  en: {
-    darkTheme: "Dark theme", lightTheme: "Light theme", language: "Language",
-    formTitle: "Get financial data",
-    formDescription: "Enter an access key to retrieve and combine data from financial sources.",
-    apiKey: "API key", apiKeyPlaceholder: "Enter API key",
-    apiKeyHelp: "The key is used only for this request and is not stored.",
-    apiKeyRequired: "Enter an API key.", loading: "Loading data...", submit: "Send request",
-    total: "Total amount", finalRounded: "The final value is bank-rounded in {currency}.",
-    totalsByCurrency: "Amounts by currency", noIntermediateRounding: "No intermediate rounding",
-    currentRates: "Current rates", asOf: "As of {date}",
-    invalidApiResponse: "{source} returned data in an unknown format.",
-    requestFailed: "{source} request failed (HTTP {status}).",
-    missingCurrencyApiKey: "The currency API key is not configured.",
-    missingCurrencyRate: "No exchange rate was provided for {currency}.",
-    unknownError: "An unknown error occurred."
-  },
-  ru: {
-    darkTheme: "Тёмная тема", lightTheme: "Светлая тема", language: "Язык",
-    formTitle: "Получение финансовых данных",
-    formDescription: "Введите ключ доступа для получения и объединения данных из финансовых источников.",
-    apiKey: "API-ключ", apiKeyPlaceholder: "Введите API-ключ",
-    apiKeyHelp: "Ключ используется только для текущего запроса и не сохраняется.",
-    apiKeyRequired: "Введите API-ключ.", loading: "Получение данных...", submit: "Отправить запрос",
-    total: "Общая сумма", finalRounded: "Финальное значение округлено по банковскому правилу в {currency}.",
-    totalsByCurrency: "Суммы по валютам", noIntermediateRounding: "Без промежуточного округления",
-    currentRates: "Актуальные курсы", asOf: "По состоянию на {date}",
-    invalidApiResponse: "{source}: API вернул данные неизвестного формата.",
-    requestFailed: "{source}: ошибка запроса (HTTP {status}).",
-    missingCurrencyApiKey: "Не настроен ключ валютного API.",
-    missingCurrencyRate: "Для валюты {currency} не предоставлен курс обмена.",
-    unknownError: "Произошла неизвестная ошибка."
-  },
-  uk: {
-    darkTheme: "Темна тема", lightTheme: "Світла тема", language: "Мова",
-    formTitle: "Отримання фінансових даних",
-    formDescription: "Введіть ключ доступу для отримання та об’єднання даних із фінансових джерел.",
-    apiKey: "API-ключ", apiKeyPlaceholder: "Введіть API-ключ",
-    apiKeyHelp: "Ключ використовується лише для поточного запиту та не зберігається.",
-    apiKeyRequired: "Введіть API-ключ.", loading: "Отримання даних...", submit: "Надіслати запит",
-    total: "Загальна сума", finalRounded: "Кінцеве значення округлено за банківським правилом у {currency}.",
-    totalsByCurrency: "Суми за валютами", noIntermediateRounding: "Без проміжного округлення",
-    currentRates: "Актуальні курси", asOf: "Станом на {date}",
-    invalidApiResponse: "{source}: API повернув дані невідомого формату.",
-    requestFailed: "{source}: помилка запиту (HTTP {status}).",
-    missingCurrencyApiKey: "Не налаштовано ключ валютного API.",
-    missingCurrencyRate: "Для валюти {currency} не надано курс обміну.",
-    unknownError: "Сталася невідома помилка."
-  }
+const en = {
+  brand: "Northstar",
+  brandTagline: "MARKET INTELLIGENCE",
+  skipToContent: "Skip to content",
+  terminal: "Terminal",
+  portfolio: "Portfolio",
+  news: "News",
+  calendar: "Calendar",
+  settings: "Settings",
+  darkTheme: "Dark theme",
+  lightTheme: "Light theme",
+  language: "Language",
+  menu: "Menu",
+  live: "Live",
+  demo: "Demo stream",
+  connecting: "Connecting",
+  reconnecting: "Reconnecting",
+  stale: "Data delayed",
+  offline: "Offline",
+  terminalTitle: "{symbol} live market",
+  terminalDescription:
+    "Streaming quotes and minute candles with a resilient realtime feed.",
+  timeframe: "Timeframe",
+  bid: "Bid",
+  ask: "Ask",
+  spread: "Spread",
+  dayChange: "Day change",
+  lastUpdate: "Last update",
+  priceChart: "{symbol} price chart",
+  candleSummary:
+    "Latest candle: open {open}, high {high}, low {low}, close {close}.",
+  balances: "Live balances",
+  currency: "Currency",
+  available: "Available",
+  reserved: "Reserved",
+  usdValue: "USD value",
+  portfolioTitle: "Portfolio balance",
+  portfolioDescription:
+    "Server-calculated balances with exact decimal arithmetic.",
+  demoPortfolioNotice:
+    "Demo snapshot is active. External credential forwarding is disabled until a provider is explicitly configured.",
+  total: "Total amount",
+  finalRounded: "The final value is bank-rounded in {currency}.",
+  totalsByCurrency: "Amounts by currency",
+  noIntermediateRounding: "No intermediate rounding",
+  currentRates: "Current rates",
+  asOf: "As of {date}",
+  newsTitle: "Market news",
+  newsDescription:
+    "A continuously updated feed of events that can move currencies.",
+  searchNews: "Search news",
+  searchPlaceholder: "Search headlines or currencies",
+  importance: "Importance",
+  all: "All",
+  high: "High",
+  medium: "Medium",
+  low: "Low",
+  noNews: "No news matches these filters.",
+  calendarTitle: "Economic calendar",
+  calendarDescription:
+    "Upcoming macro releases, forecasts and published results.",
+  country: "Country",
+  event: "Event",
+  time: "Time",
+  previous: "Previous",
+  forecast: "Forecast",
+  actual: "Actual",
+  noEvents: "No events match these filters.",
+  settingsTitle: "Terminal settings",
+  settingsDescription:
+    "Device preferences and realtime connection information.",
+  appearance: "Appearance",
+  connection: "Data connection",
+  connectionHint:
+    "Set PUBLIC_WS_URL on the server to replace the built-in demo stream.",
+  secureConfig:
+    "Provider credentials stay on the server and are never embedded in the browser bundle.",
+  systemTheme: "Use saved theme preference",
+  preferredSymbol: "Preferred instrument",
+  preferredTimeframe: "Preferred timeframe",
+  maxCandles: "Candles kept in view",
+  maxCandlesHelp: "Choose a value between 100 and 500.",
+  saveSettings: "Save settings",
+  settingsSaved: "Settings saved on this device.",
+  invalidPreferences: "Check the highlighted settings.",
+  reconnectNow: "Reconnect now",
+  appError: "Something went wrong",
+  appErrorHelp: "The requested view could not be loaded.",
+  retry: "Try again",
+  backToTerminal: "Back to terminal",
+  notFound: "This page does not exist.",
+  invalidApiResponse: "{source} returned data in an unknown format.",
+  requestFailed: "{source} request failed ({status}).",
+  missingCurrencyApiKey: "The server currency provider key is not configured.",
+  missingServerConfig: "The server setting {name} is not configured.",
+  missingCurrencyRate: "No exchange rate was provided for {currency}.",
+  invalidApiKey: "The access key was rejected.",
+  timeout: "{source} did not respond in time.",
+  rateLimited: "{source} temporarily limited requests.",
+  unknownError: "An unknown error occurred.",
 } as const;
 
-export type TranslationKey = keyof typeof translations.en;
+export type TranslationKey = keyof typeof en;
+type Dictionary = Partial<Record<TranslationKey, string>>;
 
-function detectLanguage(): Language {
-  const saved = localStorage.getItem("language");
-  if (saved === "en" || saved === "ru" || saved === "uk") return saved;
-  for (const value of navigator.languages) {
-    const code = value.toLowerCase().split("-")[0];
-    if (code === "en" || code === "ru" || code === "uk") return code;
-  }
-  return "en";
-}
+const ru: Dictionary = {
+  brandTagline: "РЫНОЧНАЯ АНАЛИТИКА",
+  skipToContent: "Перейти к содержимому",
+  terminal: "Терминал",
+  portfolio: "Портфель",
+  news: "Новости",
+  calendar: "Календарь",
+  settings: "Настройки",
+  darkTheme: "Тёмная тема",
+  lightTheme: "Светлая тема",
+  language: "Язык",
+  menu: "Меню",
+  live: "Онлайн",
+  demo: "Демо-поток",
+  connecting: "Подключение",
+  reconnecting: "Переподключение",
+  stale: "Данные задерживаются",
+  offline: "Нет соединения",
+  terminalTitle: "{symbol}: рынок в реальном времени",
+  terminalDescription:
+    "Потоковые котировки и минутные свечи с устойчивым realtime-соединением.",
+  timeframe: "Интервал",
+  bid: "Покупка",
+  ask: "Продажа",
+  spread: "Спред",
+  dayChange: "За день",
+  lastUpdate: "Обновлено",
+  priceChart: "График {symbol}",
+  balances: "Актуальные балансы",
+  currency: "Валюта",
+  available: "Доступно",
+  reserved: "Зарезервировано",
+  usdValue: "В долларах",
+  portfolioTitle: "Баланс портфеля",
+  portfolioDescription:
+    "Серверный расчёт баланса с точной десятичной арифметикой.",
+  demoPortfolioNotice:
+    "Активен демонстрационный снимок. Передача внешних ключей отключена до явной настройки провайдера.",
+  total: "Общая сумма",
+  finalRounded: "Итог округлён по банковскому правилу в {currency}.",
+  totalsByCurrency: "Суммы по валютам",
+  noIntermediateRounding: "Без промежуточного округления",
+  currentRates: "Текущие курсы",
+  asOf: "По состоянию на {date}",
+  newsTitle: "Новости рынка",
+  newsDescription: "Обновляемая лента событий, способных повлиять на валюты.",
+  searchNews: "Поиск новостей",
+  searchPlaceholder: "Заголовок или валюта",
+  importance: "Важность",
+  all: "Все",
+  high: "Высокая",
+  medium: "Средняя",
+  low: "Низкая",
+  noNews: "По этим фильтрам новостей нет.",
+  calendarTitle: "Экономический календарь",
+  calendarDescription: "Макроэкономические публикации, прогнозы и результаты.",
+  country: "Страна",
+  event: "Событие",
+  time: "Время",
+  previous: "Предыдущее",
+  forecast: "Прогноз",
+  actual: "Факт",
+  noEvents: "По этим фильтрам событий нет.",
+  settingsTitle: "Настройки терминала",
+  settingsDescription: "Параметры устройства и состояние realtime-соединения.",
+  appearance: "Оформление",
+  connection: "Подключение данных",
+  connectionHint:
+    "Задайте PUBLIC_WS_URL на сервере, чтобы заменить встроенный демо-поток.",
+  secureConfig:
+    "Ключи провайдеров остаются на сервере и не попадают в браузерный код.",
+  preferredSymbol: "Предпочитаемый инструмент",
+  preferredTimeframe: "Предпочитаемый интервал",
+  maxCandles: "Свечей в окне",
+  maxCandlesHelp: "Укажите значение от 100 до 500.",
+  saveSettings: "Сохранить настройки",
+  settingsSaved: "Настройки сохранены на этом устройстве.",
+  invalidPreferences: "Проверьте выделенные настройки.",
+  reconnectNow: "Переподключиться",
+  appError: "Что-то пошло не так",
+  appErrorHelp: "Не удалось загрузить запрошенный экран.",
+  retry: "Повторить",
+  backToTerminal: "Вернуться в терминал",
+  notFound: "Такой страницы не существует.",
+};
 
-export const language = writable<Language>(detectLanguage());
-language.subscribe((value) => {
-  localStorage.setItem("language", value);
-  document.documentElement.lang = value;
-});
+const uk: Dictionary = {
+  brandTagline: "РИНКОВА АНАЛІТИКА",
+  skipToContent: "Перейти до вмісту",
+  terminal: "Термінал",
+  portfolio: "Портфель",
+  news: "Новини",
+  calendar: "Календар",
+  settings: "Налаштування",
+  darkTheme: "Темна тема",
+  lightTheme: "Світла тема",
+  language: "Мова",
+  live: "Онлайн",
+  demo: "Демо-потік",
+  connecting: "Підключення",
+  reconnecting: "Повторне підключення",
+  stale: "Дані затримуються",
+  offline: "Немає з’єднання",
+  terminalTitle: "{symbol}: ринок у реальному часі",
+  terminalDescription:
+    "Потокові котирування та хвилинні свічки зі стійким realtime-з’єднанням.",
+  timeframe: "Інтервал",
+  bid: "Купівля",
+  ask: "Продаж",
+  dayChange: "За день",
+  balances: "Актуальні баланси",
+  portfolioTitle: "Баланс портфеля",
+  portfolioDescription:
+    "Серверний розрахунок балансу з точною десятковою арифметикою.",
+  newsTitle: "Новини ринку",
+  newsDescription: "Потік подій, здатних вплинути на валюти.",
+  calendarTitle: "Економічний календар",
+  calendarDescription: "Макроекономічні публікації, прогнози та результати.",
+  settingsTitle: "Налаштування термінала",
+  settingsDescription: "Параметри пристрою та стан realtime-з’єднання.",
+  appError: "Щось пішло не так",
+  appErrorHelp: "Не вдалося завантажити потрібний екран.",
+  retry: "Повторити",
+  backToTerminal: "Повернутися до термінала",
+  notFound: "Такої сторінки не існує.",
+};
 
-export function translate(lang: Language, key: TranslationKey, values: Record<string, string> = {}) {
+const dictionaries: Record<Language, Dictionary> = { en, ru, uk };
+
+export function translate(
+  language: Language,
+  key: TranslationKey,
+  values: Record<string, string> = {},
+) {
+  const template = dictionaries[language][key] ?? en[key];
   return Object.entries(values).reduce(
-    (message, [name, replacement]) => message.replace(`{${name}}`, replacement),
-    translations[lang][key] as string,
+    (message, [name, replacement]) =>
+      message.replaceAll(`{${name}}`, replacement),
+    template,
   );
 }

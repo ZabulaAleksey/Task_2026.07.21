@@ -1,5 +1,10 @@
 node_modules
 dist
+.svelte-kit
+.wrangler
+test-results
+playwright-report
+coverage
 .env
 .env.local
 *.local
