@@ -38,3 +38,20 @@ test("stores valid local terminal preferences", async ({ page }) => {
     )
     .toContain('"maxCandles":350');
 });
+
+test("serves hardened headers and disables portfolio caching", async ({
+  request,
+}) => {
+  const pageResponse = await request.get("/terminal/EURUSD");
+  const headers = pageResponse.headers();
+  expect(headers["content-security-policy"]).toContain("default-src 'self'");
+  expect(headers["content-security-policy"]).toContain(
+    "frame-ancestors 'none'",
+  );
+  expect(headers["x-content-type-options"]).toBe("nosniff");
+  expect(headers["x-frame-options"]).toBe("DENY");
+  expect(headers["referrer-policy"]).toBe("strict-origin-when-cross-origin");
+
+  const portfolioResponse = await request.get("/api/portfolio");
+  expect(portfolioResponse.headers()["cache-control"]).toBe("no-store");
+});

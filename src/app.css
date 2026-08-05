@@ -82,6 +82,9 @@ body {
     ),
     var(--app-bg);
 }
+.sveltekit-body {
+  display: contents;
+}
 button,
 input,
 select {

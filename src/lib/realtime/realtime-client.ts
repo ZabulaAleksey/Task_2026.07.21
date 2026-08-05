@@ -7,6 +7,10 @@ import { parseRealtimeEvent, type RealtimeEvent } from "$lib/schemas/realtime";
 import type { MarketState } from "$lib/state/market-state.svelte";
 
 const symbols = ["EURUSD", "GBPUSD", "USDJPY"];
+const MAX_REALTIME_MESSAGE_BYTES = 64 * 1_024;
+const MAX_CONSECUTIVE_INVALID_MESSAGES = 5;
+const MAX_QUEUED_EVENTS = 1_000;
+const MAX_COALESCED_EVENTS = 256;
 
 export class RealtimeClient {
   private socket: WebSocket | null = null;
@@ -18,6 +22,7 @@ export class RealtimeClient {
   private reconnectAttempt = 0;
   private demoTick = 0;
   private sequence = 1;
+  private consecutiveInvalidMessages = 0;
   private animationFrame: number | null = null;
   private latestEvents = new Map<string, RealtimeEvent>();
   private queuedEvents: RealtimeEvent[] = [];
@@ -46,6 +51,7 @@ export class RealtimeClient {
     this.animationFrame = null;
     this.latestEvents.clear();
     this.queuedEvents = [];
+    this.consecutiveInvalidMessages = 0;
     this.state.setStatus("offline");
   }
 
@@ -93,6 +99,7 @@ export class RealtimeClient {
     socket.addEventListener("open", () => {
       if (this.socket !== socket) return;
       this.reconnectAttempt = 0;
+      this.consecutiveInvalidMessages = 0;
       this.state.setStatus("online");
       socket.send(
         JSON.stringify({
@@ -117,18 +124,30 @@ export class RealtimeClient {
     });
 
     socket.addEventListener("message", (message) => {
+      if (typeof message.data !== "string") {
+        this.state.noteInvalidMessage();
+        this.closeForProtocolViolation(socket, 1003, "Text messages required");
+        return;
+      }
+      if (new Blob([message.data]).size > MAX_REALTIME_MESSAGE_BYTES) {
+        this.state.noteInvalidMessage();
+        this.closeForProtocolViolation(socket, 1009, "Message too large");
+        return;
+      }
+
       let payload: unknown;
       try {
-        payload = JSON.parse(String(message.data));
+        payload = JSON.parse(message.data);
       } catch {
-        this.state.noteInvalidMessage();
+        this.noteInvalidMessage(socket);
         return;
       }
       const event = parseRealtimeEvent(payload);
       if (!event) {
-        this.state.noteInvalidMessage();
+        this.noteInvalidMessage(socket);
         return;
       }
+      this.consecutiveInvalidMessages = 0;
       this.enqueue(event);
     });
 
@@ -151,15 +170,51 @@ export class RealtimeClient {
     this.reconnectTimer = setTimeout(() => this.connect(), delay);
   }
 
+  private noteInvalidMessage(socket: WebSocket) {
+    this.state.noteInvalidMessage();
+    this.consecutiveInvalidMessages += 1;
+    if (this.consecutiveInvalidMessages >= MAX_CONSECUTIVE_INVALID_MESSAGES) {
+      this.closeForProtocolViolation(socket, 1008, "Invalid message limit");
+    }
+  }
+
+  private closeForProtocolViolation(
+    socket: WebSocket,
+    code: number,
+    reason: string,
+  ) {
+    if (this.socket !== socket) return;
+    this.manuallyClosed = true;
+    socket.close(code, reason);
+    this.state.setStatus("offline");
+  }
+
   private enqueue(event: RealtimeEvent) {
     if (event.type === "quote.update") {
-      this.latestEvents.set(`quote:${event.data.symbol}`, event);
+      const key = `quote:${event.data.symbol}`;
+      if (
+        !this.latestEvents.has(key) &&
+        this.latestEvents.size >= MAX_COALESCED_EVENTS
+      ) {
+        this.state.noteInvalidMessage();
+        return;
+      }
+      this.latestEvents.set(key, event);
     } else if (event.type === "candle.update") {
-      this.latestEvents.set(
-        `candle:${event.data.symbol}:${event.data.timeframe}`,
-        event,
-      );
+      const key = `candle:${event.data.symbol}:${event.data.timeframe}`;
+      if (
+        !this.latestEvents.has(key) &&
+        this.latestEvents.size >= MAX_COALESCED_EVENTS
+      ) {
+        this.state.noteInvalidMessage();
+        return;
+      }
+      this.latestEvents.set(key, event);
     } else {
+      if (this.queuedEvents.length >= MAX_QUEUED_EVENTS) {
+        this.state.noteInvalidMessage();
+        return;
+      }
       this.queuedEvents.push(event);
     }
 

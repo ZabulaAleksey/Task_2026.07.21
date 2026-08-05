@@ -48,10 +48,10 @@ export class MarketState {
   }
 
   apply(event: RealtimeEvent) {
-    if (event.type !== "snapshot" && event.sequence <= this.lastSequence)
-      return;
-    this.lastSequence = Math.max(this.lastSequence, event.sequence);
+    if (event.sequence <= this.lastSequence) return;
+    this.lastSequence = event.sequence;
     this.lastEventAt = event.serverTime;
+    if (this.status === "stale") this.status = "online";
 
     switch (event.type) {
       case "snapshot": {

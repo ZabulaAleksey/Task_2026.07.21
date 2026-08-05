@@ -5,6 +5,6 @@ import type { RequestHandler } from "./$types";
 export const GET: RequestHandler = () =>
   json(createDemoFinanceData(), {
     headers: {
-      "cache-control": "private, max-age=15",
+      "cache-control": "no-store",
     },
   });

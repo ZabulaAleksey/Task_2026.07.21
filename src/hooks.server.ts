@@ -1,4 +1,30 @@
-import type { HandleServerError } from "@sveltejs/kit";
+import { dev } from "$app/environment";
+import type { Handle, HandleServerError } from "@sveltejs/kit";
+
+const SECURITY_HEADERS = {
+  "permissions-policy":
+    "camera=(), geolocation=(), microphone=(), payment=(), usb=()",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "x-content-type-options": "nosniff",
+  "x-frame-options": "DENY",
+} as const;
+
+export const handle: Handle = async ({ event, resolve }) => {
+  const response = await resolve(event);
+  const hardenedResponse = new Response(response.body, response);
+
+  for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
+    hardenedResponse.headers.set(name, value);
+  }
+  if (event.url.protocol === "https:") {
+    hardenedResponse.headers.set(
+      "strict-transport-security",
+      "max-age=31536000",
+    );
+  }
+
+  return hardenedResponse;
+};
 
 export const handleError: HandleServerError = ({
   error,
@@ -12,8 +38,9 @@ export const handleError: HandleServerError = ({
     method: event.request.method,
     path: event.url.pathname,
     status,
-    error,
+    errorName: error instanceof Error ? error.name : "UnknownError",
   });
+  if (dev) console.error(error);
 
   return {
     message:
